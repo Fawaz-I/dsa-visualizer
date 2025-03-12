@@ -1,6 +1,7 @@
 # Data Structures and Algorithms Visualizer
 
 An interactive web application for visualizing data structures and algorithms commonly taught in computer science courses.
+https://fawaz-i.github.io/dsa-visualizer/
 
 ## Features
 
