@@ -583,8 +583,8 @@ const PathfindingVisualizer = () => {
                 </option>
               ))}
             </select>
-            <button className="btn" onClick={visualizeAlgorithm} disabled={isAnimating}>
-              Visualize
+            <button className={`btn ${!isAnimating ? 'btn-ready' : ''}`} onClick={visualizeAlgorithm} disabled={isAnimating}>
+              {isAnimating ? 'Visualizing...' : 'Visualize'}
             </button>
           </div>
         </div>
@@ -623,7 +623,16 @@ const PathfindingVisualizer = () => {
       
       {/* Instructions */}
       <div className="instructions">
-        <p><strong>Instructions:</strong> Click and drag to draw walls. Drag the green start node or the red end node to reposition them.</p>
+        <p><strong>How to use:</strong></p>
+        <ol>
+          <li>Choose a pathfinding algorithm from the dropdown</li>
+          <li>Click and drag to draw walls on the grid</li>
+          <li>Drag the green start node or the red end node to reposition them</li>
+          <li>Click the "Visualize" button to start the animation</li>
+          <li>Use the "Clear Path" button to remove the path but keep walls</li>
+          <li>Use the "Reset Grid" button to start over completely</li>
+        </ol>
+        <p><strong>Color guide:</strong> <span style={{ color: '#4caf50' }}>Green</span> = start node, <span style={{ color: '#f44336' }}>Red</span> = end node, <span style={{ color: '#333' }}>Black</span> = wall</p>
       </div>
       
       {/* Grid */}

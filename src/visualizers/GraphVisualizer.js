@@ -548,6 +548,14 @@ const GraphVisualizer = () => {
     setMessage('Visualization reset');
   };
   
+  // Hard reset - create a new graph
+  const hardReset = () => {
+    pauseAnimation();
+    resetAnimation();
+    generateRandomGraph();
+    setMessage('Hard reset completed - generated new graph');
+  };
+  
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -688,8 +696,8 @@ const GraphVisualizer = () => {
               onChange={(e) => setStartVertex(e.target.value)}
               maxLength={1}
             />
-            <button className="btn" onClick={executeAlgorithm} disabled={isAnimating}>
-              Execute
+            <button className="btn btn-ready" onClick={executeAlgorithm} disabled={isAnimating}>
+              Execute Algorithm
             </button>
           </div>
         </div>
@@ -719,15 +727,18 @@ const GraphVisualizer = () => {
               </button>
             ) : (
               <button
-                className="btn"
+                className="btn btn-ready"
                 onClick={() => startAnimation(animationFrames)}
                 disabled={animationFrames.length === 0 || currentFrame === animationFrames.length - 1}
               >
-                {currentFrame === 0 ? 'Start' : 'Resume'}
+                {currentFrame === 0 ? 'Start Animation' : 'Resume'}
               </button>
             )}
-            <button className="btn" onClick={resetVisualization}>
+            <button className="btn btn-secondary" onClick={resetVisualization}>
               Reset
+            </button>
+            <button className="btn btn-secondary" onClick={hardReset}>
+              Hard Reset
             </button>
           </div>
         </div>
@@ -735,6 +746,26 @@ const GraphVisualizer = () => {
       
       {/* Message box */}
       {message && <div className="message">{message}</div>}
+      
+      {/* Instructions */}
+      <div className="instructions">
+        <p><strong>How to use:</strong></p>
+        <ol>
+          <li>Select graph type (directed or undirected)</li>
+          <li>Generate a random graph or create your own by adding vertices and edges</li>
+          <li>Choose an algorithm and specify a start vertex</li>
+          <li>Click the <strong>"Execute"</strong> button to start the animation</li>
+          <li>Use <strong>"Pause"</strong> to stop temporarily, <strong>"Reset"</strong> to restart, or <strong>"Hard Reset"</strong> if you encounter issues</li>
+        </ol>
+        <p><strong>Color guide:</strong></p>
+        <ul>
+          <li><span style={{ color: '#4a90e2' }}>Blue</span> = Default vertex</li>
+          <li><span style={{ color: '#f44336' }}>Red</span> = Current active vertex</li>
+          <li><span style={{ color: '#4caf50' }}>Green</span> = Visited vertex</li>
+          <li><span style={{ color: '#ff9800' }}>Orange</span> = Start vertex</li>
+        </ul>
+        <p><strong>Troubleshooting:</strong> If the animation doesn't work as expected, try using the "Hard Reset" button to generate a new graph.</p>
+      </div>
       
       {/* Visualization area */}
       <div className="visualization-area">

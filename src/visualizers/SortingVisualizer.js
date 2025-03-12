@@ -562,6 +562,23 @@ const SortingVisualizer = () => {
       animationRef.current = setTimeout(animate, delay);
     };
     
+    // Process the first frame immediately if available
+    if (animationFrames.length > 0) {
+      const frame = animationFrames[0];
+      if (frame) {
+        switch (frame.type) {
+          case 'compare':
+            setComparedIndices(frame.indices);
+            break;
+          case 'pivot':
+            setPivotIndices(frame.indices);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    
     animate();
   };
   
@@ -576,7 +593,17 @@ const SortingVisualizer = () => {
   const resetVisualization = () => {
     pauseAnimation();
     resetAnimation();
+    // Create a new array with the same values to force a re-render
+    setArray([...array]);
     setMessage('Visualization reset');
+  };
+  
+  // Hard reset - generate a new array
+  const hardReset = () => {
+    pauseAnimation();
+    resetAnimation();
+    generateRandomArray(array.length);
+    setMessage('Hard reset completed - generated new array');
   };
   
   // Clean up on unmount
@@ -666,16 +693,19 @@ const SortingVisualizer = () => {
           <h3>Controls</h3>
           <div className="control-row">
             {!isAnimating ? (
-              <button className="btn" onClick={startAnimation} disabled={currentFrame === animationFrames.length}>
-                {currentFrame === 0 ? 'Start' : 'Resume'}
+              <button className="btn btn-ready" onClick={startAnimation} disabled={currentFrame === animationFrames.length}>
+                {currentFrame === 0 ? 'Start Sorting' : 'Resume'}
               </button>
             ) : (
               <button className="btn" onClick={pauseAnimation}>
                 Pause
               </button>
             )}
-            <button className="btn" onClick={resetVisualization}>
+            <button className="btn btn-secondary" onClick={resetVisualization}>
               Reset
+            </button>
+            <button className="btn btn-secondary" onClick={hardReset}>
+              Hard Reset
             </button>
           </div>
         </div>
@@ -683,6 +713,24 @@ const SortingVisualizer = () => {
       
       {/* Message box */}
       {message && <div className="message">{message}</div>}
+      
+      {/* Instructions */}
+      <div className="instructions">
+        <p><strong>How to use:</strong></p>
+        <ol>
+          <li>Select an array size from the buttons above</li>
+          <li>Choose a sorting algorithm from the dropdown</li>
+          <li>Click the <strong>"Start Sorting"</strong> button to begin the animation</li>
+          <li>Use <strong>"Pause"</strong> to stop temporarily, <strong>"Reset"</strong> to restart, or <strong>"Hard Reset"</strong> if you encounter issues</li>
+        </ol>
+        <p><strong>Color guide:</strong></p>
+        <ul>
+          <li><span style={{ color: '#f44336' }}>Red</span> = Elements being compared or swapped</li>
+          <li><span style={{ color: '#ff9800' }}>Orange</span> = Pivot element (Quick Sort)</li>
+          <li><span style={{ color: '#4caf50' }}>Green</span> = Elements in their final sorted position</li>
+        </ul>
+        <p><strong>Troubleshooting:</strong> If animation doesn't work as expected, try using the "Hard Reset" button to generate a new array.</p>
+      </div>
       
       {/* Visualization area */}
       <div className="visualization-area">

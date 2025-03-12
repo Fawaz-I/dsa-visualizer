@@ -63,6 +63,36 @@ const searchAlgorithms = {
       let left = 0;
       let right = array.length - 1;
       
+      // Early check if the array is empty
+      if (array.length === 0) {
+        frames.push({
+          type: 'not-found',
+          indices: [],
+          array,
+        });
+        return frames;
+      }
+      
+      // Check if target is outside the array bounds
+      if (target < array[0] || target > array[array.length - 1]) {
+        frames.push({
+          type: 'compare',
+          indices: [0],
+          array,
+        });
+        frames.push({
+          type: 'compare',
+          indices: [array.length - 1],
+          array,
+        });
+        frames.push({
+          type: 'not-found',
+          indices: [],
+          array,
+        });
+        return frames;
+      }
+      
       while (left <= right) {
         const mid = Math.floor((left + right) / 2);
         
@@ -112,6 +142,16 @@ const searchAlgorithms = {
       let left = 0;
       let right = array.length - 1;
       
+      // Early check if the array is empty
+      if (array.length === 0) {
+        return -1;
+      }
+      
+      // Check if target is outside the array bounds
+      if (target < array[0] || target > array[array.length - 1]) {
+        return -1;
+      }
+      
       while (left <= right) {
         const mid = Math.floor((left + right) / 2);
         
@@ -147,8 +187,23 @@ const searchAlgorithms = {
       
       let prev = 0;
       
+      // Check if target is greater than the last element in the array
+      if (target > array[n - 1]) {
+        frames.push({
+          type: 'compare',
+          indices: [n - 1],
+          array,
+        });
+        frames.push({
+          type: 'not-found',
+          indices: [],
+          array,
+        });
+        return frames;
+      }
+      
       // Finding the block where the element may be present
-      while (array[Math.min(step, n) - 1] < target) {
+      while (prev < n && array[Math.min(step, n) - 1] < target) {
         // Add frame for current block check
         frames.push({
           type: 'compare',
@@ -171,7 +226,8 @@ const searchAlgorithms = {
       }
       
       // Doing a linear search in the identified block
-      for (let i = prev; i < Math.min(step, n); i++) {
+      let linearSearchLimit = Math.min(step, n);
+      for (let i = prev; i < linearSearchLimit; i++) {
         // Add frame for current element being checked
         frames.push({
           type: 'compare',
@@ -184,6 +240,16 @@ const searchAlgorithms = {
           frames.push({
             type: 'found',
             indices: [i],
+            array,
+          });
+          return frames;
+        }
+        
+        // If we encounter a value greater than the target, we know the target is not in the array
+        if (array[i] > target) {
+          frames.push({
+            type: 'not-found',
+            indices: [],
             array,
           });
           return frames;
@@ -205,7 +271,12 @@ const searchAlgorithms = {
       
       let prev = 0;
       
-      while (array[Math.min(step, n) - 1] < target) {
+      // Check if target is greater than the last element in the array
+      if (target > array[n - 1]) {
+        return -1;
+      }
+      
+      while (prev < n && array[Math.min(step, n) - 1] < target) {
         prev = step;
         step += Math.floor(Math.sqrt(n));
         
@@ -214,9 +285,16 @@ const searchAlgorithms = {
         }
       }
       
-      for (let i = prev; i < Math.min(step, n); i++) {
+      // Linear search in the identified block
+      let linearSearchLimit = Math.min(step, n);
+      for (let i = prev; i < linearSearchLimit; i++) {
         if (array[i] === target) {
           return i;
+        }
+        
+        // If we encounter a value greater than the target, we know the target is not in the array
+        if (array[i] > target) {
+          return -1;
         }
       }
       
@@ -238,6 +316,36 @@ const searchAlgorithms = {
       const frames = [];
       let left = 0;
       let right = array.length - 1;
+      
+      // Early check if the array is empty
+      if (array.length === 0) {
+        frames.push({
+          type: 'not-found',
+          indices: [],
+          array,
+        });
+        return frames;
+      }
+      
+      // Check if target is outside the array bounds
+      if (target < array[0] || target > array[array.length - 1]) {
+        frames.push({
+          type: 'compare',
+          indices: [0],
+          array,
+        });
+        frames.push({
+          type: 'compare',
+          indices: [array.length - 1],
+          array,
+        });
+        frames.push({
+          type: 'not-found',
+          indices: [],
+          array,
+        });
+        return frames;
+      }
       
       while (
         left <= right &&
@@ -263,35 +371,70 @@ const searchAlgorithms = {
           return frames;
         }
         
+        // Check for division by zero (when all elements are equal)
+        if (array[right] === array[left]) {
+          // If target equals the common value, it can be anywhere, so check left first
+          if (array[left] === target) {
+            frames.push({
+              type: 'compare',
+              indices: [left],
+              array,
+            });
+            
+            frames.push({
+              type: 'found',
+              indices: [left],
+              array,
+            });
+            return frames;
+          } else {
+            frames.push({
+              type: 'compare',
+              indices: [left],
+              array,
+            });
+            
+            frames.push({
+              type: 'not-found',
+              indices: [],
+              array,
+            });
+            return frames;
+          }
+        }
+        
         // Calculate the probable position using the interpolation formula
         const pos = left + Math.floor(
           ((right - left) / (array[right] - array[left])) *
             (target - array[left])
         );
         
+        // Ensure pos is within bounds
+        const safePos = Math.max(left, Math.min(right, pos));
+        
         // Add frame for current position
         frames.push({
           type: 'compare',
-          indices: [pos],
+          indices: [safePos],
           array,
         });
         
-        if (array[pos] === target) {
+        if (array[safePos] === target) {
           // Target found
           frames.push({
             type: 'found',
-            indices: [pos],
+            indices: [safePos],
             array,
           });
           return frames;
         }
         
-        if (array[pos] < target) {
+        if (array[safePos] < target) {
           // Target is in the right sub-array
-          left = pos + 1;
+          left = safePos + 1;
         } else {
           // Target is in the left sub-array
-          right = pos - 1;
+          right = safePos - 1;
         }
       }
       
@@ -308,6 +451,16 @@ const searchAlgorithms = {
       let left = 0;
       let right = array.length - 1;
       
+      // Early check if the array is empty
+      if (array.length === 0) {
+        return -1;
+      }
+      
+      // Check if target is outside the array bounds
+      if (target < array[0] || target > array[array.length - 1]) {
+        return -1;
+      }
+      
       while (
         left <= right &&
         target >= array[left] &&
@@ -317,19 +470,27 @@ const searchAlgorithms = {
           return array[left] === target ? left : -1;
         }
         
+        // Check for division by zero (when all elements are equal)
+        if (array[right] === array[left]) {
+          return array[left] === target ? left : -1;
+        }
+        
         const pos = left + Math.floor(
           ((right - left) / (array[right] - array[left])) *
             (target - array[left])
         );
         
-        if (array[pos] === target) {
-          return pos;
+        // Ensure pos is within bounds
+        const safePos = Math.max(left, Math.min(right, pos));
+        
+        if (array[safePos] === target) {
+          return safePos;
         }
         
-        if (array[pos] < target) {
-          left = pos + 1;
+        if (array[safePos] < target) {
+          left = safePos + 1;
         } else {
-          right = pos - 1;
+          right = safePos - 1;
         }
       }
       
@@ -414,6 +575,9 @@ const SearchVisualizer = () => {
     const targetValue = parseInt(target);
     resetAnimation();
     
+    // Log for debugging
+    console.log(`Searching for target: ${targetValue} in array:`, array);
+    
     // Generate animation frames
     const frames = searchAlgorithms[algorithm].getAnimationFrames(array, targetValue);
     setAnimationFrames(frames);
@@ -422,62 +586,73 @@ const SearchVisualizer = () => {
     const result = searchAlgorithms[algorithm].execute(array, targetValue);
     setSearchResult(result);
     
+    console.log(`Search result: ${result}`);
+    console.log('Animation frames:', frames);
+    
     // Start animation
     startAnimation(frames);
   };
   
-  // Start the animation
   const startAnimation = (frames) => {
+    if (frames.length === 0) {
+      setMessage('No frames to animate. Please try again with a different target.');
+      return;
+    }
+    
     setIsAnimating(true);
     setMessage(`Visualizing ${searchAlgorithms[algorithm].name}...`);
+    setCurrentFrame(0); // Start from the beginning
     
     // Start animation loop
     const animate = () => {
       setCurrentFrame((prevFrame) => {
-        const nextFrame = prevFrame + 1;
+        // Process the current frame
+        const frame = frames[prevFrame];
+        
+        if (frame) {
+          switch (frame.type) {
+            case 'compare':
+              setCompareIndices(frame.indices);
+              setRangeIndices([]);
+              setFoundIndex(null);
+              break;
+            case 'range':
+              setRangeIndices(frame.indices);
+              setCompareIndices([frame.indices[1]]); // middle element
+              setFoundIndex(null);
+              break;
+            case 'found':
+              setCompareIndices([]);
+              setRangeIndices([]);
+              setFoundIndex(frame.indices[0]);
+              break;
+            case 'not-found':
+              setCompareIndices([]);
+              setRangeIndices([]);
+              setFoundIndex(null);
+              break;
+            default:
+              break;
+          }
+        }
         
         // Check if animation is complete
+        const nextFrame = prevFrame + 1;
         if (nextFrame >= frames.length) {
-          setIsAnimating(false);
+          setTimeout(() => {
+            setIsAnimating(false);
+            
+            if (frames[frames.length - 1].type === 'found') {
+              setMessage(`Target found at index ${searchResult}`);
+            } else {
+              setMessage('Target not found in the array');
+            }
+          }, 1000); // Show the final state for a second
           
-          if (frames[frames.length - 1].type === 'found') {
-            setMessage(`Target found at index ${searchResult}`);
-          } else {
-            setMessage('Target not found in the array');
-          }
-          
-          return prevFrame;
+          return prevFrame; // Keep the same frame (the last one)
         }
         
-        // Process the next frame
-        const frame = frames[nextFrame];
-        
-        switch (frame.type) {
-          case 'compare':
-            setCompareIndices(frame.indices);
-            setRangeIndices([]);
-            setFoundIndex(null);
-            break;
-          case 'range':
-            setRangeIndices(frame.indices);
-            setCompareIndices([frame.indices[1]]); // middle element
-            setFoundIndex(null);
-            break;
-          case 'found':
-            setCompareIndices([]);
-            setRangeIndices([]);
-            setFoundIndex(frame.indices[0]);
-            break;
-          case 'not-found':
-            setCompareIndices([]);
-            setRangeIndices([]);
-            setFoundIndex(null);
-            break;
-          default:
-            break;
-        }
-        
-        return nextFrame;
+        return nextFrame; // Advance to next frame
       });
       
       // Calculate delay based on speed (inverted: higher speed = lower delay)
@@ -485,7 +660,24 @@ const SearchVisualizer = () => {
       animationRef.current = setTimeout(animate, delay);
     };
     
-    animate();
+    // Process the first frame immediately
+    if (frames.length > 0) {
+      const frame = frames[0];
+      switch (frame.type) {
+        case 'compare':
+          setCompareIndices(frame.indices);
+          break;
+        case 'range':
+          setRangeIndices(frame.indices);
+          setCompareIndices([frame.indices[1]]);
+          break;
+        default:
+          break;
+      }
+    }
+    
+    // Start animation with a slight delay
+    setTimeout(animate, 500);
   };
   
   // Pause the animation
@@ -499,7 +691,17 @@ const SearchVisualizer = () => {
   const resetVisualization = () => {
     pauseAnimation();
     resetAnimation();
+    // Force re-render by creating a new array with the same values
+    setArray([...array]);
     setMessage('Visualization reset');
+  };
+  
+  // Hard reset - create a new array
+  const hardReset = () => {
+    pauseAnimation();
+    resetAnimation();
+    generateRandomArray(array.length);
+    setMessage('Hard reset completed - generated new array');
   };
   
   // Clean up on unmount
@@ -571,8 +773,23 @@ const SearchVisualizer = () => {
               value={target}
               onChange={handleTargetChange}
             />
-            <button className="btn" onClick={executeSearch} disabled={isAnimating}>
-              Search
+            <button 
+              className={`btn ${target && !isAnimating ? 'btn-ready' : ''}`} 
+              onClick={executeSearch} 
+              disabled={isAnimating || !target}
+            >
+              {isAnimating ? 'Running...' : (target ? 'Search' : 'Enter Target')}
+            </button>
+            {isAnimating && (
+              <button className="btn btn-secondary" onClick={pauseAnimation}>
+                Pause
+              </button>
+            )}
+            <button className="btn btn-secondary" onClick={resetVisualization}>
+              Reset
+            </button>
+            <button className="btn btn-secondary" onClick={hardReset}>
+              Hard Reset
             </button>
           </div>
         </div>
@@ -594,8 +811,26 @@ const SearchVisualizer = () => {
         </div>
       </div>
       
-      {/* Message box */}
+      {/* Message box and instructions */}
       {message && <div className="message">{message}</div>}
+      
+      {/* Animation instructions */}
+      <div className="instructions">
+        <p><strong>How to use:</strong></p>
+        <ol>
+          <li>Select an array size from the buttons above</li>
+          <li>Choose a search algorithm from the dropdown</li>
+          <li>Enter a target value to search for</li>
+          <li>Click the "Search" button to start the animation</li>
+        </ol>
+        <p><strong>Color guide:</strong></p>
+        <ul>
+          <li><span style={{ color: '#ff9800' }}>Orange</span> = Currently examining this element</li>
+          <li><span style={{ color: '#2196f3' }}>Blue highlight</span> = Current search range (Binary Search)</li>
+          <li><span style={{ color: '#4caf50' }}>Green</span> = Target found at this position</li>
+        </ul>
+        <p><strong>Troubleshooting:</strong> If the animation doesn't work as expected, try regenerating the array and searching again.</p>
+      </div>
       
       {/* Visualization area */}
       <div className="visualization-area">
@@ -605,8 +840,9 @@ const SearchVisualizer = () => {
               key={index}
               className={getElementClassName(index)}
               style={{
-                width: `${Math.max(40, 800 / array.length - 4)}px`,
-                height: `${Math.max(40, 800 / array.length - 4)}px`,
+                width: `${Math.max(30, Math.min(60, 800 / array.length - 4))}px`,
+                height: `${Math.max(30, Math.min(60, 800 / array.length - 4))}px`,
+                fontSize: array.length > 30 ? '10px' : 'inherit'
               }}
             >
               {value}
