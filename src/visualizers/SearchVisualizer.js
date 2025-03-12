@@ -567,6 +567,7 @@ const SearchVisualizer = () => {
   
   // Execute search
   const executeSearch = () => {
+    setFoundIndex(null); // Reset the found index at the beginning of a new search
     if (!target || isNaN(parseInt(target))) {
       setMessage('Please enter a valid target value');
       return;
@@ -643,7 +644,7 @@ const SearchVisualizer = () => {
             setIsAnimating(false);
             
             if (frames[frames.length - 1].type === 'found') {
-              setMessage(`Target found at index ${searchResult}`);
+              setMessage(`Target found at index ${foundIndex !== null ? foundIndex : searchResult}`);
             } else {
               setMessage('Target not found in the array');
             }

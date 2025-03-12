@@ -693,7 +693,7 @@ const SortingVisualizer = () => {
           <h3>Controls</h3>
           <div className="control-row">
             {!isAnimating ? (
-              <button className="btn btn-ready" onClick={startAnimation} disabled={currentFrame === animationFrames.length}>
+              <button className="btn btn-ready" onClick={startAnimation} disabled={isAnimating || (currentFrame > 0 && currentFrame === animationFrames.length)}>
                 {currentFrame === 0 ? 'Start Sorting' : 'Resume'}
               </button>
             ) : (
