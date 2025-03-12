@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/dsa-visualizer/static/css/main.9e55cc87.css",
+    "main.js": "/dsa-visualizer/static/js/main.8a840a33.js",
+    "index.html": "/dsa-visualizer/index.html",
+    "main.9e55cc87.css.map": "/dsa-visualizer/static/css/main.9e55cc87.css.map",
+    "main.8a840a33.js.map": "/dsa-visualizer/static/js/main.8a840a33.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9e55cc87.css",
+    "static/js/main.8a840a33.js"
+  ]
+}
